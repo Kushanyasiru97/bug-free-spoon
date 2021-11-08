@@ -1,13 +1,12 @@
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:food_app/login_page.dart';
+import 'package:food_app/homePage.dart';
 import 'package:food_app/signup_page.dart';
-/*import 'package:food_app/signup_page.dart';
-import 'package:food_app/welcome_page.dart';*/
+import 'package:food_app/welcome_page.dart';
+import 'login_page.dart';
 
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
+
+
+void main() {
   runApp(MyApp());
 }
 
@@ -18,9 +17,13 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Food App',
       theme: ThemeData(
+        scaffoldBackgroundColor: Colors.blueGrey,
+        appBarTheme: AppBarTheme(
+          color: Colors.blueGrey,
+        )
       ),
       debugShowCheckedModeBanner: false,
-      home: SignUp(),
+      home:homePage(),
     );
   }
 }

@@ -5,196 +5,218 @@ import 'package:food_app/screen/widgets/mytext_field.dart';
 
 class SignUp extends StatefulWidget {
   static Pattern pattern =
-      r'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[!@#\$&*~]).{8,}$';
+      r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$';
   @override
   _SignUpState createState() => _SignUpState();
 }
 class _SignUpState extends State<SignUp> {
-  late UserCredential userCredential;
-  /*RegExp regExp = RegExp(SignUp.pattern);*/
+  bool loading=false;
+  UserCredential userCredential;
+  RegExp regExp = RegExp(SignUp.pattern);
   TextEditingController firstName = TextEditingController();
   TextEditingController lastName = TextEditingController();
   TextEditingController email = TextEditingController();
   TextEditingController password = TextEditingController();
-  GlobalKey<ScaffoldState> globalKey = GlobalKey<ScaffoldState> ();
+  GlobalKey<ScaffoldState> globalKey = GlobalKey<ScaffoldState>();
 
-  Future sendData() async{
+  Future sendData() async {
     try {
-      UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
-          email: email.text,
-          password: password.text
+      userCredential =
+      await FirebaseAuth.instance.createUserWithEmailAndPassword(
+        email: email.text,
+        password: password.text,
       );
-     await FirebaseFirestore.instance.collection('userData').doc(userCredential.user!.uid).set({
-        'firstName' : firstName,
-        'lastName' : lastName,
-        'email' : email,
-        'userId': userCredential.user!.uid,
-        'password': password,
+      await FirebaseFirestore.instance
+          .collection('userData')
+          .doc(userCredential.user.uid)
+          .set({
+        "firstName": firstName.text.trim(),
+        "lastName": lastName.text.trim(),
+        "email": email.text.trim(),
+        "userid": userCredential.user.uid,
+        "password": password.text.trim(),
       });
     } on FirebaseAuthException catch (e) {
       if (e.code == 'weak-password') {
-        globalKey.currentState!.showSnackBar(
-          SnackBar(content: Text("Your Entered Password Too Weak!"),),
+        globalKey.currentState.showSnackBar(
+          SnackBar(
+            content: Text("The password provided is too weak."),
+          ),
         );
       } else if (e.code == 'email-already-in-use') {
-        globalKey.currentState!.showSnackBar(
-            SnackBar(content: Text("Your Entered Email address already Use"),),
+        globalKey.currentState.showSnackBar(
+          SnackBar(
+            content: Text("The account already exists for that email"),
+          ),
         );
       }
     } catch (e) {
-      print(e);
+      globalKey.currentState.showSnackBar(
+        SnackBar(
+          content: Text(e),
+        ),
+      );
+      setState(() {
+        loading=false;
+      });
     }
+    setState(() {
+      loading=false;
+    });
   }
-
-
-
 
   void validation() {
     if (firstName.text.trim().isEmpty || firstName.text.trim() == null) {
-      globalKey.currentState!.showSnackBar(
+      globalKey.currentState.showSnackBar(
         SnackBar(
           content: Text(
-              'First Name is Empty!'),
-        ),
-      );
-      return;
-    }
-
-
-    if(lastName.text.trim().isEmpty || lastName.text.trim() == null){
-    globalKey.currentState!.showSnackBar(
-    SnackBar(
-    content: Text(
-    'Last Name is Empty!'),
-    ),
-    );
-    return;
-    }
-
-    if(email.text.trim().isEmpty || email.text.trim() == null){
-      globalKey.currentState!.showSnackBar(
-        SnackBar(
-          content: Text(
-              'Email is Empty!'),
-        ),
-      );
-      return;
-    }
-    /*else if (!regExp.hasMatch(email.text)) {
-      globalKey.currentState!.showSnackBar(
-        SnackBar(
-          content: Text(
-            "Please enter the vaild Email",
+            "firstName is Empty",
           ),
         ),
       );
       return;
-    }*/
-
-    if(password.text.trim().isEmpty || password.text.trim() == null){
-    globalKey.currentState!.showSnackBar(
-    SnackBar(
-    content: Text(
-    'Password is Empty!'),
-    ),
-    );
-    return;
     }
-    else{
+    if (lastName.text.trim().isEmpty || lastName.text.trim() == null) {
+      globalKey.currentState.showSnackBar(
+        SnackBar(
+          content: Text(
+            "lastName is Empty",
+          ),
+        ),
+      );
+      return;
+    }
+    if (email.text.trim().isEmpty || email.text.trim() == null) {
+      globalKey.currentState.showSnackBar(
+        SnackBar(
+          content: Text(
+            "Email is Empty",
+          ),
+        ),
+      );
+      return;
+    } else if (!regExp.hasMatch(email.text)) {
+      globalKey.currentState.showSnackBar(
+        SnackBar(
+          content: Text(
+            "Please enter vaild Email",
+          ),
+        ),
+      );
+      return;
+    }
+    if (password.text.trim().isEmpty || password.text.trim() == null) {
+      globalKey.currentState.showSnackBar(
+        SnackBar(
+          content: Text(
+            "Password is Empty",
+          ),
+        ),
+      );
+      return;
+    } else {
+      setState(() {
+        loading=true;
+      });
       sendData();
     }
   }
 
-  Widget button({required String buttonName, required Color buttonColor, required Color textColor,required Function ontap}){
+  Widget button(
+      {@required String buttonName,
+        @required Color color,
+        @required Color textColor,
+        @required Function ontap}) {
     return Container(
-      height: 50.0,
-      width: 130.0,
+      width: 120,
       child: RaisedButton(
-        color: buttonColor,
+        color: color,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20.0),
+          borderRadius: BorderRadius.circular(30),
         ),
         child: Text(
           buttonName,
-          style: TextStyle(
-            color: textColor,
-            fontSize: 20.0,
-          ),
+          style: TextStyle(fontSize: 20, color: textColor),
         ),
-        onPressed: () {  },
+        onPressed: ontap,
       ),
     );
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       key: globalKey,
-      backgroundColor: Colors.black12,
+      backgroundColor: Colors.black,
       body: SafeArea(
         child: Container(
-          margin: EdgeInsets.symmetric(horizontal: 40.0),
+          margin: EdgeInsets.symmetric(horizontal: 50),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               Text(
-                "SIGN UP",
+                "Sign Up",
                 style: TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.bold,
-                  fontSize: 40.0
+                  fontSize: 40,
                 ),
               ),
               Container(
-                height: 300.0,
+                height: 300,
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                MytextField(
-                  hintText: 'FirstName',
-                  obscureText: false,
-                  controler: firstName,
-                ),
                     MytextField(
-                        hintText: 'LastName',
+                      controler: firstName,
                       obscureText: false,
+                      hintText: 'fistName',
+                    ),
+                    MytextField(
                       controler: lastName,
-                    ),
-                    MytextField(
-                        hintText: 'Email',
                       obscureText: false,
+                      hintText: 'lastName',
+                    ),
+                    MytextField(
                       controler: email,
+                      obscureText: false,
+                      hintText: 'Email',
                     ),
                     MytextField(
-                        hintText: 'Password',
-                      obscureText: true,
                       controler: password,
-                    ),
-                    MytextField(
-                        hintText: 'Confirm Password',
                       obscureText: true,
-                      controler: password,
-                    ),
+                      hintText: 'password',
+                    )
                   ],
                 ),
               ),
+              loading?Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  CircularProgressIndicator(),
+                ],
+              )
+                  :
               Row(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   button(
-                    ontap: (){},
-                      buttonName: "Cancel",
-                      buttonColor: Colors.white,
-                      textColor: Colors.grey
+                    ontap: () {},
+                    buttonName: "Canel",
+                    color: Colors.grey,
+                    textColor: Colors.black,
                   ),
-                  SizedBox(width:20.0,),
-
-                     button(
-                       ontap: (){
-                         validation();
-                       },
-                      buttonName: "Register",
-                      buttonColor: Colors.red,
-                      textColor: Colors.white,
+                  SizedBox(
+                    width: 10,
+                  ),
+                  button(
+                    ontap: () {
+                      validation();
+                    },
+                    buttonName: "Register",
+                    color: Colors.red,
+                    textColor: Colors.white,
                   ),
                 ],
               )
@@ -205,4 +227,3 @@ class _SignUpState extends State<SignUp> {
     );
   }
 }
-

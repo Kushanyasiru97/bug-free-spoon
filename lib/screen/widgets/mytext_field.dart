@@ -4,7 +4,7 @@ class MytextField extends StatelessWidget {
     final String hintText;
     final bool obscureText;
     final TextEditingController controler;
-    MytextField({required this.hintText, required this.obscureText, required this.controler});
+    MytextField({@required this.hintText, @required this.obscureText, @required this.controler});
   @override
   Widget build(BuildContext context) {
     return TextFormField(

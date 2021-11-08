@@ -1,34 +1,68 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:food_app/screen/widgets/mytext_field.dart';
 
-
 class LoginPage extends StatefulWidget {
-
   static Pattern pattern =
-      r'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[!@#\$&*~]).{8,}$';
-
+      r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$';
   @override
   _LoginPageState createState() => _LoginPageState();
 }
 
 class _LoginPageState extends State<LoginPage> {
-  /*RegExp regExp = RegExp(LoginPage.pattern);*/
-TextEditingController email = TextEditingController();
+  bool loadding = false;
+  RegExp regExp = RegExp(LoginPage.pattern);
+  GlobalKey<ScaffoldState> globalKey = GlobalKey<ScaffoldState>();
+  UserCredential userCredential;
+  TextEditingController email = TextEditingController();
   TextEditingController password = TextEditingController();
-  GlobalKey<ScaffoldState> globalKey = GlobalKey<ScaffoldState> ();
+
+  Future loginAuth() async {
+    try {
+      userCredential = await FirebaseAuth.instance.signInWithEmailAndPassword(
+          email: email.text, password: password.text);
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'user-not-found') {
+        globalKey.currentState.showSnackBar(
+          SnackBar(
+            content: Text('No user found for that email.'),
+          ),
+        );
+      } else if (e.code == 'wrong-password') {
+        globalKey.currentState.showSnackBar(
+          SnackBar(
+            content: Text('Wrong password provided for that user.'),
+          ),
+        );
+        setState(() {
+          loadding = false;
+        });
+      }
+      setState(() {
+        loadding = false;
+      });
+    }
+  }
 
   void validation() {
-    if(email.text.trim().isEmpty || email.text.trim() == null){
-      globalKey.currentState!.showSnackBar(
+    if (email.text.trim().isEmpty ||
+        email.text.trim() == null && password.text.trim().isEmpty ||
+        password.text.trim() == null) {
+      globalKey.currentState.showSnackBar(
         SnackBar(
-          content: Text(
-              'Email is Empty!'),
+          content: Text("All Field is Empty"),
+        ),
+      );
+    }
+    if (email.text.trim().isEmpty || email.text.trim() == null) {
+      globalKey.currentState.showSnackBar(
+        SnackBar(
+          content: Text("Email is Empty"),
         ),
       );
       return;
-    }
-   /* else if (!regExp.hasMatch(email.text)) {
-      globalKey.currentState!.showSnackBar(
+    } else if (!regExp.hasMatch(email.text)) {
+      globalKey.currentState.showSnackBar(
         SnackBar(
           content: Text(
             "Please enter vaild Email",
@@ -36,19 +70,22 @@ TextEditingController email = TextEditingController();
         ),
       );
       return;
-    }*/
-
-
-    if(password.text.trim().isEmpty || password.text.trim() == null){
-      globalKey.currentState!.showSnackBar(
+    }
+    if (password.text.trim().isEmpty || password.text.trim() == null) {
+      globalKey.currentState.showSnackBar(
         SnackBar(
-          content: Text(
-              'Password is Empty!'),
+          content: Text("Password is Empty"),
         ),
       );
       return;
+    } else {
+      setState(() {
+        loadding = true;
+      });
+      loginAuth();
     }
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -70,9 +107,9 @@ TextEditingController email = TextEditingController();
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Padding(
-              padding: const EdgeInsets.only(right: 170),
+              padding: const EdgeInsets.all(20),
               child: Text(
-                "Login In",
+                "LOGIN IN",
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 40,
@@ -97,7 +134,9 @@ TextEditingController email = TextEditingController();
                 ),
               ],
             ),
-            Container(
+            loadding
+                ? CircularProgressIndicator()
+                : Container(
               height: 60,
               width: 200,
               child: RaisedButton(

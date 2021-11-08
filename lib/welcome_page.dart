@@ -2,8 +2,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class Welcome extends StatelessWidget {
-  const Welcome({Key? key}) : super(key: key);
-  Widget button({required String name,required Color color,required Color textColor}){
+  /*const Welcome({Key ? key}) : super(key: key);*/
+  Widget button({@required String name,@required Color color,@required Color textColor}){
     return Container(
             height: 45.0,
             width: 250.0,
