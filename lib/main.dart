@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:food_app/homePage.dart';
 import 'package:food_app/signup_page.dart';
@@ -15,6 +16,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'Food App',
       theme: ThemeData(
         scaffoldBackgroundColor: Colors.blueGrey,
@@ -22,8 +24,15 @@ class MyApp extends StatelessWidget {
           color: Colors.blueGrey,
         )
       ),
-      debugShowCheckedModeBanner: false,
-      home:homePage(),
+      home: homePage()/*StreamBuilder(
+        stream: FirebaseAuth.instance.authStateChanges(),
+        builder: (index, sncpshot){
+          if(sncpshot.hasData){
+            return homePage();
+          }
+          return LoginPage();
+        },
+      ),*/
     );
   }
 }
