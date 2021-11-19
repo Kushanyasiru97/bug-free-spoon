@@ -3,6 +3,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:food_app/homePage.dart';
 import 'package:food_app/provider/my_provider.dart';
+import 'package:food_app/screen/cart.dart';
 import 'package:food_app/screen/detail_page.dart';
 import 'package:food_app/signup_page.dart';
 import 'package:food_app/welcome_page.dart';
@@ -34,7 +35,7 @@ class MyApp extends StatelessWidget {
             color: Colors.blueGrey,
           )
         ),
-        home: detailPage(),
+        home: homePage(),
         // home: StreamBuilder(
         //     stream: FirebaseAuth.instance.authStateChanges(),
         //     builder: (index, sncpshot) {

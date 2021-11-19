@@ -1,7 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:food_app/models/cart_model.dart';
 import 'package:food_app/models/categories_model.dart';
 import 'package:food_app/models/food_model.dart';
+import 'package:food_app/models/foodcategory_model.dart';
 
 class MyProvider extends ChangeNotifier{
   List<CategoriesModel> burgerList=[];
@@ -155,5 +157,120 @@ List<FoodModel> foodModelList = [];
   }
   get throwFoodModelList{
     return foodModelList;
+  }
+  
+  
+  //*************Burger Category section*************************//
+List<FoodCategoryModel> burgerCategoryList =[];
+  FoodCategoryModel burgerCategoryModel;
+  Future<void> getBurgerCategoryList() async {
+    List<FoodCategoryModel> newBurgerCategoryList =[];
+    QuerySnapshot querySnapshot = await FirebaseFirestore.instance.collection("foodCategory").doc("wR16cIV2QwXbCVZ9RV02").collection("burger").get();
+    querySnapshot.docs.forEach((element) {
+      burgerCategoryModel = FoodCategoryModel(
+          image: element.data()['image'],
+          name: element.data()['name'],
+          price: element.data()['price'],
+      );
+      newBurgerCategoryList.add(burgerCategoryModel);
+      burgerCategoryList = newBurgerCategoryList;
+    });
+  }
+  get throwBurgerCategoryList{
+    return burgerCategoryList;
+  }
+  //*************Pizza Category section*************************//
+  List<FoodCategoryModel> pizzaCategoryList =[];
+  FoodCategoryModel pizzaCategoryModel;
+  Future<void> getPizzaCategoryList() async {
+    List<FoodCategoryModel> newPizzaCategoryList =[];
+    QuerySnapshot querySnapshot = await FirebaseFirestore.instance.collection("foodCategory").doc("wR16cIV2QwXbCVZ9RV02").collection("pizza").get();
+    querySnapshot.docs.forEach((element) {
+      pizzaCategoryModel = FoodCategoryModel(
+        image: element.data()['image'],
+        name: element.data()['name'],
+        price: element.data()['price'],
+      );
+      newPizzaCategoryList.add(pizzaCategoryModel);
+      pizzaCategoryList = newPizzaCategoryList;
+    });
+  }
+  get throwPizzaCategoryList{
+    return pizzaCategoryList;
+  }
+  //*************BBQ Category section*************************//
+  List<FoodCategoryModel> bbqCategoryList =[];
+  FoodCategoryModel bbqCategoryModel;
+  Future<void> getBbqCategoryList() async {
+    List<FoodCategoryModel> newBbqCategoryList =[];
+    QuerySnapshot querySnapshot = await FirebaseFirestore.instance.collection("foodCategory").doc("wR16cIV2QwXbCVZ9RV02").collection("bbq").get();
+    querySnapshot.docs.forEach((element) {
+      bbqCategoryModel = FoodCategoryModel(
+        image: element.data()['image'],
+        name: element.data()['name'],
+        price: element.data()['price'],
+      );
+      newBbqCategoryList.add(bbqCategoryModel);
+      bbqCategoryList = newBbqCategoryList;
+    });
+  }
+  get throwBbqCategoryList{
+    return bbqCategoryList;
+  }
+  //*************Rice Category section*************************//
+  List<FoodCategoryModel> riceCategoryList =[];
+  FoodCategoryModel riceCategoryModel;
+  Future<void> getRiceCategoryList() async {
+    List<FoodCategoryModel> newRiceCategoryList =[];
+    QuerySnapshot querySnapshot = await FirebaseFirestore.instance.collection("foodCategory").doc("wR16cIV2QwXbCVZ9RV02").collection("rice").get();
+    querySnapshot.docs.forEach((element) {
+      riceCategoryModel = FoodCategoryModel(
+        image: element.data()['image'],
+        name: element.data()['name'],
+        price: element.data()['price'],
+      );
+      newRiceCategoryList.add(riceCategoryModel);
+      riceCategoryList = newRiceCategoryList;
+    });
+  }
+  get throwRiceCategoryList{
+    return riceCategoryList;
+  }
+
+
+  //***************Cart Section**********************//
+
+  //*******Add to Cart**************//
+List<CartModel> cartList = [];
+  List<CartModel> newCartList = [];
+  CartModel cartModel;
+  void addToCart({@required String image,@required String name,@required int price,@required int quantity}){
+    cartModel = CartModel(
+        image: image,
+        name: name,
+        price: price,
+        quantity: quantity
+    );
+    newCartList.add(cartModel);
+    cartList = newCartList;
+  }
+  get throwCartList{
+    return cartList;
+  }
+
+  int totalPrice(){
+    int totalprice =1;
+    cartList.forEach((element) {
+      totalprice += element.price * element.quantity;
+    });
+    return totalprice;
+  }
+  int deleteIndex;
+  void getDeleteIndex(int index){
+    deleteIndex=index;
+  }
+  void delete(){
+    cartList.removeAt(deleteIndex);
+    notifyListeners();
   }
 }
